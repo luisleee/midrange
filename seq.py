@@ -17,7 +17,7 @@ def to_range(filename):
 
         for msg in track:
             while len(tempo_changes) > 0:
-                if tempo_changes[0][0] < t:
+                if tempo_changes[-1][0] <= t:
                     tempo = tempo_changes.pop()[1]
                 else:
                     break
@@ -28,11 +28,12 @@ def to_range(filename):
                 note[msg.note] = t
             if msg.type == "note_off":
                 try:
-                    arr.append((round(note[msg.note], 2), round(t, 2)))
+                    arr.append([round(note[msg.note], 2), round(t, 2)])
                 except:
                     pass
                 note[msg.note] = None
-        res.append(arr)
+        if len(arr) != 0:
+            res.append(arr)
     return res
 
 
@@ -45,9 +46,10 @@ def get_set_tempo(midiFile):
                 arr.append((tick, msg.tempo))
                 continue
             tick += msg.time
-    arr.sort(key=lambda x: x[0])
+    arr.sort(key=lambda x: -x[0])
     return arr
 
+# [[0.48,1.93],[4.35,5.80],[15.96,17.41],[19.83,21.29]]
 
 if __name__ == "__main__":
     if len(argv) <= 1:
